@@ -11,18 +11,28 @@ let draggedElement = null;
 
 let todoList = JSON.parse(localStorage.getItem("todoList")) || [];
 
-// Cập nhật danh sách hiển thị
+
 const updateTodoList = (tasks = todoList) => {
     list.innerHTML = '';
+    tasks = tasks.filter((item) => item !== null && item !== undefined && Object.keys(item).length !== 0);
     tasks.forEach((item, index) => {
         const li = document.createElement("li");
         li.id = `task-${index}`;
         li.className = item.completed ? "completed" : "";
+        li.setAttribute('draggable', true);
+        li.setAttribute('data-index', index);
         li.innerHTML = tag_li(item.text, index);
+        
+        // Thêm event listeners drag and drop
+        li.addEventListener('dragstart', dragStart);
+        li.addEventListener('dragover', dragOver);
+        li.addEventListener('drop', drop);
+        
         list.appendChild(li);
     });
-};
 
+    localStorage.setItem("todoList", JSON.stringify(tasks));
+};
 
 
 const tag_li = (value, index) => {
@@ -135,54 +145,50 @@ const filterTask = (filterType) => {
 
 // Sắp xếp
 
-list.addEventListener("dragstart", (e) => {
-    if (e.target && e.target.tagName === "LI") {
-        draggedElement = e.target;
-        draggedElement.style.opacity = "0.5"; // Cải thiện khả năng nhận diện
-    }
-});
-
-list.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    const targetElement = e.target;
-    if (targetElement && targetElement.tagName === "LI" && targetElement !== draggedElement) {
-        draggedElement = targetElement;
-    }
-});
 
 
-list.addEventListener("drop", (e) => {
-    e.preventDefault();
-    const targetElement = e.target;
-
-    // Kiểm tra nếu targetElement là phần tử <li> hợp lệ
-    if (targetElement && targetElement.tagName === "LI" && draggedElement !== targetElement) {
-        const draggedIndex = draggedElement.getAttribute("data-index");
-        const targetIndex = targetElement.getAttribute("data-index");
-
-        // Tạo một bản sao của mảng todoList để tránh thay đổi mảng gốc
-        const todoListCopy = [...todoList];
-
-        // Di chuyển phần tử đang được kéo đến vị trí mới
-        const draggedTask = todoListCopy[draggedIndex];
-        todoListCopy.splice(draggedIndex, 1);
-        todoListCopy.splice(targetIndex, 0, draggedTask);
-
-        // Cập nhật lại mảng todoList
-        todoList = todoListCopy;
-
-        // Lưu lại vào localStorage
-        localStorage.setItem("todoList", JSON.stringify(todoList));
-
-        // Cập nhật lại giao diện
-        updateTodoList(todoList);
-    }
-});
+function renderTodoList() {
+    list.innerHTML = "";
+    todoList.forEach((task, index) => {
+      const li = document.createElement("li");
+      li.textContent = task.content;
+      li.setAttribute("data-index", index);
+      li.setAttribute("draggable", "true"); // Thêm thuộc tính
+      li.addEventListener("dragstart", dragStart); // Gắn sự kiện
+      list.appendChild(li);
+    });
+  }
 
 
-list.addEventListener("dragend", (e) => {
-    e.target.style.opacity = "1";
-});
+const dragStart = (event) => {
+    draggedElement = event.target;
+    // Đặt lại kiểu cursor để biểu thị việc kéo
+    event.target.style.opacity = "0.5";
+};
+
+// Hàm xử lý khi thả phần tử
+const drop = (event) => {
+    event.preventDefault();
+    if (!draggedElement || event.target === draggedElement) return;
+
+    const draggedIndex = parseInt(draggedElement.dataset.index);
+    const targetIndex = parseInt(event.target.closest('li').dataset.index);
+    
+    // Hoán đổi vị trí trong mảng
+    const temp = todoList[draggedIndex];
+    todoList[draggedIndex] = todoList[targetIndex];
+    todoList[targetIndex] = temp;
+
+    // Cập nhật localStorage và render lại
+    localStorage.setItem("todoList", JSON.stringify(todoList));
+    updateTodoList();
+    draggedElement = null;
+};
+
+// Hàm xử lý khi kéo qua một phần tử (cho phép thả)
+const dragOver = (event) => {
+    event.preventDefault();
+};
 
 // Khởi tạo ứng dụng
 updateTodoList();

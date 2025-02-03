@@ -23,7 +23,7 @@
 
 #list_task{
     width: 90%;
-    height: 550px;
+    height: 400px;
     margin: 30px;
     list-style-type: none;
     overflow: auto;
