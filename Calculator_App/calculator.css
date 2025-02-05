@@ -57,3 +57,20 @@
     margin-top: 5px;
     color: aliceblue;
 }
+
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.delete-button {
+    width: 50px;
+    background-color: red;
+    border-radius: 100px;
+    border: none;
+    color: white;
+    cursor: pointer;
+}

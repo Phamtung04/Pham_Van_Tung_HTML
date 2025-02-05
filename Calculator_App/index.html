@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <div class="container1">
+    <div class="container1" >
         <div class="calculator">
             <button class="history" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-clock-history" viewBox="0 0 16 16">
@@ -20,7 +20,7 @@
                 </svg>
             </button>
 
-            <input type="text" placeholder="0" id="inputBox">
+            <input type="text" placeholder="0" id="inputBox" readonly>
             <div>
                 <button style="background-color: rgb(203, 245, 245);" data-clear-all class="btn">C</button>
                 <button style="background-color: rgb(203, 245, 245);" data-clear class="btn">X</button>
@@ -64,9 +64,6 @@
                     </div>
                     <div class="modal-body">
                         <ul class="history-list"></ul>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
