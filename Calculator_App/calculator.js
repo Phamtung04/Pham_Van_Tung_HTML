@@ -3,8 +3,10 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentInput = "0";
     let shouldResetScreen = false;
     let hasOperation = false; // check operation
+
     let history = [];
-    let results = '';
+    let expression = '';
+
 
 
     const updateInputBox = () => {
@@ -67,15 +69,16 @@ document.addEventListener("DOMContentLoaded", () => {
         updateInputBox();
     });
 
-
     document.querySelector('[data-equals]').addEventListener('click', () => {
+        if (!currentInput) return;
+
+        const originalExpression = currentInput;
         try {
             if (currentInput.includes('/0')) {
                 throw new Error("Không thể chia cho 0");
             }
 
             const result = eval(currentInput);
-
             if (!isFinite(result) || isNaN(result)) {
                 throw new Error("Lỗi tính toán");
             }
@@ -83,12 +86,16 @@ document.addEventListener("DOMContentLoaded", () => {
             currentInput = result.toString();
             shouldResetScreen = true;
             updateInputBox();
+
+            addHistory(originalExpression, result);
         } catch (error) {
+            console.error("Lỗi tính toán:", error);
             currentInput = 'Lỗi tính toán';
             shouldResetScreen = true;
             updateInputBox();
         }
     });
+
 
     document.addEventListener('keydown', (event) => {
         const key = event.key;
@@ -113,5 +120,44 @@ document.addEventListener("DOMContentLoaded", () => {
             document.querySelector('[data-equals]')?.click();
         }
     });
+
+
+
+    const updateHistory = () => {
+        const historyList = document.querySelector('.history-list');
+        if (historyList) {
+            historyList.innerHTML = '';
+            history.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'history-item';
+                li.innerHTML = `
+              <span class="history-expression">${item.expression} = </span>
+              <span class="history-result">${item.result}</span>
+            `;
+
+                li.addEventListener('click', () => {
+                    currentInput = item.expression;
+                    updateInputBox();
+                    new bootstrap.Modal(document.getElementById('exampleModal')).hide();
+                });
+                historyList.appendChild(li);
+            });
+        }
+    }
+
+    const addHistory = (expression, result) => {
+        history.unshift({
+            expression: expression,
+            result: result
+        });
+
+        if (history.length > 50) {
+            history.pop();
+        }
+
+        updateHistory();
+    }
+
+    
 
 });
